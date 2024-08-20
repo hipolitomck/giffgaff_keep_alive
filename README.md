@@ -1,6 +1,6 @@
-# GiffGaff Keep Alive Script
+# giffgaff Keep Alive Script
 
-This project includes a Bash script and a Python-based WeCom (WeChat Work) notification system designed to periodically activate a GiffGaff SIM card for the purpose of keeping the number active. The script temporarily activates mobile data on the SIM card for a short period, ensuring the SIM remains active without incurring significant charges. Notifications are sent via WeCom to confirm successful activation.
+This project includes a Bash script and a Python-based WeCom (WeChat Work) notification system designed to periodically activate a giffgaff SIM card for the purpose of keeping the number active. The script temporarily activates mobile data on the SIM card for a short period, ensuring the SIM remains active without incurring significant charges. Notifications are sent via WeCom to confirm successful activation.
 
 ## Project Structure
 
