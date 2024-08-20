@@ -75,7 +75,7 @@ If the script is run via crontab, check the log file for execution details:
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the Mozilla License. See the LICENSE file for details.
 
 ## Conclusion
 
