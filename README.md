@@ -76,7 +76,3 @@ If the script is run via crontab, check the log file for execution details:
 ## License
 
 This project is licensed under the Mozilla License. See the LICENSE file for details.
-
-## Conclusion
-
-This project automates the process of keeping a GiffGaff SIM card active by periodically activating the mobile data connection, with notifications sent to WeCom to confirm the operation. This is especially useful for users who want to ensure their SIM remains active without manually intervening.
