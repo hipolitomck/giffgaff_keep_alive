@@ -1,40 +1,65 @@
 #!/bin/bash
 
-# 定义标题和内容用于发送企业微信通知
-title="GiffGaff Keep Alive"
-content="GiffGaff SIM has been activated to keep the number alive."
+# 定义变量
+TITLE="GiffGaff Keep Alive"
+CONTENT="GiffGaff SIM has been activated to keep the number alive."
+LOG_FILE="/var/log/giffgaff_keep_alive.log"
+NM_DIR="/etc/NetworkManager/system-connections"
+HOME_DIR="/home"
+MODEM_FILE="modem.nmconnection"
+PYTHON_SCRIPT="wecom_notify.py"
 
-# 日志文件路径
-log_file="/var/log/giffgaff_keep_alive.log"
+# 日志函数
+log() {
+    echo "$(date): $1" >> "$LOG_FILE"
+}
+
+# 错误处理函数
+handle_error() {
+    log "$1"
+    python3 "$PYTHON_SCRIPT" "$TITLE" "Error: $1" || log "Failed to send error notification."
+    exit 1
+}
 
 # Step 1: 将 modem.nmconnection 移回 NetworkManager 目录
-mv /home/modem.nmconnection /etc/NetworkManager/system-connections/ || { echo "$(date): Failed to move modem.nmconnection to NetworkManager directory." >> $log_file; exit 1; }
+mv "$HOME_DIR/$MODEM_FILE" "$NM_DIR/" || handle_error "Failed to move $MODEM_FILE to NetworkManager directory."
 
 # Step 2: 重启 NetworkManager 服务
-systemctl restart NetworkManager || { echo "$(date): Failed to restart NetworkManager." >> $log_file; exit 1; }
+systemctl restart NetworkManager || handle_error "Failed to restart NetworkManager."
 
-# Step 3: 检索并启用包含 “modem” 字段的网络连接
-modem_conn=$(nmcli connection show | grep modem | awk '{print $1}')
+# Step 3: 检索并启用包含 "modem" 字段的网络连接
+modem_conn=$(nmcli -t -f NAME connection show | grep modem)
 
-if [ -n "$modem_conn" ]; then
-    nmcli connection up "$modem_conn" || { echo "$(date): Failed to bring up modem connection." >> $log_file; exit 1; }
-else
-    echo "$(date): No modem connection found." >> $log_file
-    exit 1
+if [ -z "$modem_conn" ]; then
+    handle_error "No modem connection found."
 fi
 
-# Step 4: 等待 5 秒钟
+nmcli connection up "$modem_conn" || handle_error "Failed to bring up modem connection."
+
+# Step 4: 等待连接建立
+for i in {1..30}; do
+    if nmcli -t -f STATE general | grep -q "connected"; then
+        break
+    fi
+    sleep 1
+done
+
+if ! nmcli -t -f STATE general | grep -q "connected"; then
+    handle_error "Failed to establish network connection after 30 seconds."
+fi
+
+# Step 5: 保持连接活跃5秒
 sleep 5
 
-# Step 5: 关闭网络连接
-nmcli connection down "$modem_conn" || { echo "$(date): Failed to bring down modem connection." >> $log_file; exit 1; }
+# Step 6: 关闭网络连接
+nmcli connection down "$modem_conn" || handle_error "Failed to bring down modem connection."
 
-# Step 6: 将 modem.nmconnection 移动回 /home 目录
-mv /etc/NetworkManager/system-connections/modem.nmconnection /home/ || { echo "$(date): Failed to move modem.nmconnection back to home directory." >> $log_file; exit 1; }
+# Step 7: 将 modem.nmconnection 移动回 /home 目录
+mv "$NM_DIR/$MODEM_FILE" "$HOME_DIR/" || handle_error "Failed to move $MODEM_FILE back to home directory."
 
-# Step 7: 调用 WeCom 应用通知的 Python 脚本
-python3 wecom_notify.py "$title" "$content" || { echo "$(date): Failed to send WeCom notification." >> $log_file; exit 1; }
+# Step 8: 调用 WeCom 应用通知的 Python 脚本
+python3 "$PYTHON_SCRIPT" "$TITLE" "$CONTENT" || handle_error "Failed to send WeCom notification."
 
-# Step 8: 记录成功信息并退出
-echo "$(date): GiffGaff Keep Alive process completed successfully." >> $log_file
+# Step 9: 记录成功信息并退出
+log "GiffGaff Keep Alive process completed successfully."
 exit 0
