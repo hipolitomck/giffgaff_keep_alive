@@ -22,7 +22,7 @@ Clone the repository to your UFI:
     git clone https://github.com/your-username/giffgaff-keep-alive.git
     cd giffgaff-keep-alive
 
-Open the wecom_config.py file and add your WeCom details:
+Open the wecom_notify.py file and add your WeCom details:
 
     Corpid = "your_corpid"  # Your WeCom CorpID
     Agentid = "your_agentid"  # Your WeCom AgentID
