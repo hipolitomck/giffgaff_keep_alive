@@ -13,7 +13,7 @@ This project includes a Bash script and a Python-based WeCom (WeChat Work) notif
     Debian-based Linux System
     NetworkManager for managing network connections.
     WeCom (WeChat Work) Account with a custom app for notifications.
-    Python 3.x installed with requests module (pip install requests).
+    Python 3.x installed with requests module (pip3 install requests).
 
 ## Installation
 
