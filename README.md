@@ -5,7 +5,7 @@ This project includes a Bash script and a Python-based WeCom (WeChat Work) notif
 ## Project Structure
 
     giffgaff_keep_alive.sh - The main script that activates the GiffGaff SIM and handles the network connection.
-    wecom_config.py - Configuration file for the WeCom (WeChat Work) API credentials and settings.
+    
     wecom_notify.py - Python script to send notifications through WeCom.
 
 ## Requirements
